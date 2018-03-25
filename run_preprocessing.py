@@ -4,7 +4,7 @@
 the running script
 """
 import xml.sax
-import xml as h
+import xml_handler as h
 
 # create a XMLReader
 parser = xml.sax.make_parser()
@@ -16,7 +16,7 @@ handler = h.xml_news_handler()
 parser.setContentHandler(handler)
 
 # parse xml file
-parser.parse("news_tensite_xml.smarty.xml")
+parser.parse("input.xml")
 
 # sort the doc_list
 my_alphabet = ['0', '1', '2','3', '4', '5','6','7', '8', '9'];
@@ -26,3 +26,6 @@ def custom_key(doc):
       numbers.append(my_alphabet.index(letter))
    return numbers
 handler.doc_list.sort(key=custom_key)
+
+# wirte output xml file
+h.generate_xml_from_doc_list(handler.doc_list,"output.xml")
