@@ -118,7 +118,6 @@ OUTPUT xml date file form：<date> elements added, and <doc> elements were sorte
 
 """
 import xml.sax as sax
-import operator
 
 class xml_news_handler(sax.ContentHandler):
     """
@@ -147,8 +146,8 @@ class xml_news_handler(sax.ContentHandler):
         if tag == 'doc':
             # init the doc when end elemnt is doc
             self._doc.init({'url':self._url,'doc':self._docno,'contenttitle':self._contenttitle,'content':self._content})
-            if self._doc.date:
-                # add the date into list if the date is not empty
+            if self._doc.date and self._doc.content and self._doc.docno and self._doc.url and self._doc.contenttitle:
+                # add the date into list if the doc is not empty
                 self.doc_list.append(self._doc)
 
     def characters(self, content):
@@ -210,10 +209,11 @@ class doc(object):
 
 from xml.dom import minidom
 
-def generate_xml_from_doc_list(list):
+def generate_xml_from_doc_list(list,outputfile):
     """
     transfer the doc list into xml file
     :param list:doc list
+    :param outputfile: output xml file path
     """
     impl = minidom.getDOMImplementation()
 
@@ -222,7 +222,7 @@ def generate_xml_from_doc_list(list):
     d = impl.createDocument(None, None, None)
 
     # create root element
-    rootElement = d.createElement('all')
+    root = d.createElement('all')
 
     # add sub elments into root
     for e in list:
@@ -249,11 +249,9 @@ def generate_xml_from_doc_list(list):
         doc.appendChild(date)
 
         # insert doc into root
-        d.appendChild(doc)
+        root.appendChild(doc)
 
     # write into xml file
-    f = open('test.xml', 'a')
-    # 写入文件
-    doc.writexml(f, addindent=' ', newl='\n')
-    # 关闭
+    f = open(outputfile, 'w',encoding='utf-8')
+    root.writexml(f, addindent=' ', newl='\n')
     f.close()
