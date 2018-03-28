@@ -127,10 +127,6 @@ class xml_news_handler(sax.ContentHandler):
     doc_list = []
     # tmp variable
     _doc=None
-    _url = ''
-    _docno = ''
-    _contenttitle = ''
-    _content = ''
     _tag = ''
 
     def __init__(self):
@@ -144,8 +140,8 @@ class xml_news_handler(sax.ContentHandler):
 
     def endElement(self, tag):
         if tag == 'doc':
-            # init the doc when end elemnt is doc
-            self._doc.init({'url':self._url,'doc':self._docno,'contenttitle':self._contenttitle,'content':self._content})
+            if not self._doc.date:
+                self._doc.url2date(self._doc.url)
             if self._doc.date and self._doc.content and self._doc.docno and self._doc.url and self._doc.contenttitle:
                 # add the date into list if the doc is not empty
                 self.doc_list.append(self._doc)
@@ -161,6 +157,9 @@ class xml_news_handler(sax.ContentHandler):
             self._doc.contenttitle = content.strip()
         elif self._tag == 'content':
             self._doc.content = content.strip()
+        elif self._tag == 'date':
+            self._doc.date = content.strip()
+
 
 class doc(object):
     """
@@ -200,12 +199,16 @@ class doc(object):
         if kwargs.get('date'):
             self.date = kwargs['date']
         else:
-            # fetching the date info if the url contains
-            import re
-            search = re.search("/20\d{6}/", self.url)
-            if search:
-                self.date = self.url[search.span()[0] + 1: search.span()[1] - 1]
+            self.url2date(self.url)
 
+    def url2date(self, url):
+        """
+        fetching the date info if the url contains
+        """
+        import re
+        search = re.search("/20\d{6}/", self.url)
+        if search:
+            self.date = self.url[search.span()[0] + 1: search.span()[1] - 1]
 
 from xml.dom import minidom
 
@@ -255,3 +258,20 @@ def generate_xml_from_doc_list(list,outputfile):
     f = open(outputfile, 'w',encoding='utf-8')
     root.writexml(f, addindent=' ', newl='\n')
     f.close()
+
+def sample(list,begin_date,end_date):
+    """
+    keep the data in the list whose  begin_date<=date<=end_date
+    :param list:
+    :param begin_date:
+    :param end_date:
+    :return: sample(list)
+    """
+    b_d = int(begin_date)
+    e_d = int(end_date)
+    sample = []
+    for doc in list:
+        d = int(doc.date)
+        if b_d <= d and d <= e_d:
+            sample.append(doc)
+    return sample
