@@ -295,3 +295,57 @@ def load_data_from_xml(xml_file):
     parser.parse(xml_file)
 
     return handler
+
+def unique(duplicated_list):
+    """
+    drop the duplicated docno and keep only the unique doc
+    :param the duplicated doc list:
+    :return:the unique doc list
+    """
+    set = {}
+    for d in duplicated_list:
+        set[d.docno] = d
+    return list(set.values())
+
+import re
+def cut_off(list):
+    """
+    cut off the useless content in the doc
+    :param list: input doc list
+    :return: the cut -off doc list
+    """
+    # prefix
+    # 证券时报记者获悉，
+    # 雅虎体育讯　新京报讯（记者赵宇）
+    # 据外媒消息
+    # 中新网６月１５日电　据日本共同社报道
+    # 据新华社莫斯科６月１４日电（记者／刘恺）
+    # 本报讯　（见习记者　许光耀）
+    # 新华社供本报特稿　（凌朔）
+    # 环球时报记者伊文　据美国有线电视新闻网１３日报道
+    # 新华网巴黎６月１４日电
+    # 中广网北京６月１５日消息（记者韩秀）据中国之声《央广新闻》报道
+
+    # suffix
+    # （来源：新京报）
+    # 作者：蒋旭峰樊宇
+    # 作者：汪亮亮　孙伟　张梦思　（来源：荆楚网）
+    # （来源：金羊网）
+    for d in list:
+        s = d.content
+        pattern = "^.{0,40}报道"
+        s = re.sub(pattern, "", s, count=0)
+        pattern = "^.{0,15}消息"
+        s = re.sub(pattern, "", s, count=0)
+        pattern = "^.{0,15}迅"
+        s = re.sub(pattern, "", s, count=0)
+        pattern = "^.{0,15}电"
+        s = re.sub(pattern, "", s, count=0)
+        pattern = "^.{0,15}（{.{2,10}}）"
+        s = re.sub(pattern, "", s, count=0)
+        pattern = "^.{0,15}获悉"
+        s = re.sub(pattern, "", s, count=0)
+        pattern = "^（.{0,15}）$"
+        s = re.sub(pattern, "", s, count=0)
+        pattern = "^作者.{0,15}$"
+        s = re.sub(pattern, "", s, count=0)
