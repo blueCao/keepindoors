@@ -275,3 +275,23 @@ def sample(list,begin_date,end_date):
         if b_d <= d and d <= e_d:
             sample.append(doc)
     return sample
+
+def load_data_from_xml(xml_file):
+    """
+    load xml data into meory and return the xml_news_handler instances
+    :param xml_file: the source xml file
+    :return: the xml_news_handler
+    """
+    # create a XMLReader
+    parser = sax.make_parser()
+    # turn off namepsaces
+    parser.setFeature(sax.handler.feature_namespaces, 0)
+
+    # Overwrite ContextHandler
+    handler = xml_news_handler()
+    parser.setContentHandler(handler)
+
+    # parse xml file
+    parser.parse(xml_file)
+
+    return handler

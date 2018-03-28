@@ -3,20 +3,10 @@
 """
 the running script
 """
-import xml.sax
 import xml_handler as h
 
-# create a XMLReader
-parser = xml.sax.make_parser()
-# turn off namepsaces
-parser.setFeature(xml.sax.handler.feature_namespaces, 0)
-
-# Overwrite ContextHandler
-handler = h.xml_news_handler()
-parser.setContentHandler(handler)
-
-# parse xml file
-parser.parse("input.xml")
+# load data into memory
+handler = h.load_data_from_xml("input.xml")
 
 # sort the doc_list
 my_alphabet = ['0', '1', '2','3', '4', '5','6','7', '8', '9'];
