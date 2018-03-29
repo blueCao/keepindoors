@@ -128,6 +128,7 @@ class xml_news_handler(sax.ContentHandler):
     # tmp variable
     _doc=None
     _tag = ''
+    _word=''
 
     def __init__(self):
         doc_list=[]
@@ -145,6 +146,8 @@ class xml_news_handler(sax.ContentHandler):
             if self._doc.date and self._doc.content and self._doc.docno and self._doc.url and self._doc.contenttitle:
                 # add the date into list if the doc is not empty
                 self.doc_list.append(self._doc)
+        elif tag == 'texkrank':
+            self._doc.textrank = {}
 
     def characters(self, content):
         if not content.strip():
@@ -159,7 +162,10 @@ class xml_news_handler(sax.ContentHandler):
             self._doc.content = content.strip()
         elif self._tag == 'date':
             self._doc.date = content.strip()
-
+        elif self._tag == "word":
+            self._word = content
+        elif self._tag == "weight":
+            self._doc.textrank[self._word] = float(content)
 
 class doc(object):
     """
@@ -169,12 +175,15 @@ class doc(object):
         contenttitle
         content
         date
+
+        textrank
     """
     url = ''
     docno = ''
     contenttitle = ''
     content = ''
     date = ''
+    textrank = {}
 
     def __init__(self, **kwargs):
         """
@@ -259,6 +268,18 @@ def generate_xml_from_doc_list(list,outputfile):
         doc.appendChild(contenttitle)
         doc.appendChild(content)
         doc.appendChild(date)
+
+        # insert the text rank info if its contains the rank
+        if e.textrank:
+            t = d.createElement('textrank')
+            for wor,wei in e.textrank:
+                word = d.createElement('word')
+                weight = d.createElement('weight')
+                word.appendChild(d.createTextNode(wor))
+                weight.appendChild(d.createTextNode(str(wei)))
+                t.appendChild(word)
+                t.appendChild(weight)
+            doc.appendChild(t)
 
         # insert doc into root
         root.appendChild(doc)
