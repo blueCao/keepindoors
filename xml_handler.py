@@ -210,6 +210,15 @@ class doc(object):
         if search:
             self.date = self.url[search.span()[0] + 1: search.span()[1] - 1]
 
+    def copy(self):
+        c = doc()
+        c.content = self.content
+        c.date = self.date
+        c.docno = self.docno
+        c.url = self.url
+        c.contenttitle = self.contenttitle
+        return c
+
 from xml.dom import minidom
 
 def generate_xml_from_doc_list(list,outputfile):
@@ -308,6 +317,8 @@ def unique(duplicated_list):
     return list(set.values())
 
 import re
+import str2bytes2utf8 as convert
+
 def cut_off(list):
     """
     cut off the useless content in the doc
@@ -331,21 +342,45 @@ def cut_off(list):
     # 作者：蒋旭峰樊宇
     # 作者：汪亮亮　孙伟　张梦思　（来源：荆楚网）
     # （来源：金羊网）
+    cut_off_list = []
     for d in list:
         s = d.content
-        pattern = "^.{0,40}报道"
+        s = convert.str2utf8(s)
+        pattern = "^.{0,300}报道"
+        pattern = convert.pattern2utf8(pattern)
         s = re.sub(pattern, "", s, count=0)
-        pattern = "^.{0,15}消息"
+
+        pattern = "^.{0,300}消息"
+        pattern = convert.pattern2utf8(pattern)
         s = re.sub(pattern, "", s, count=0)
-        pattern = "^.{0,15}迅"
+
+        pattern = "^.{0,240}讯"
+        pattern = convert.pattern2utf8(pattern)
         s = re.sub(pattern, "", s, count=0)
-        pattern = "^.{0,15}电"
+
+        pattern = "^.{0,240}电"
+        pattern = convert.pattern2utf8(pattern)
         s = re.sub(pattern, "", s, count=0)
-        pattern = "^.{0,15}（{.{2,10}}）"
+
+        pattern = "^.{0,480}（{.{12,120}}）"
+        pattern = convert.pattern2utf8(pattern)
         s = re.sub(pattern, "", s, count=0)
-        pattern = "^.{0,15}获悉"
+
+        pattern = "^.{0,240}获悉"
+        pattern = convert.pattern2utf8(pattern)
         s = re.sub(pattern, "", s, count=0)
-        pattern = "^（.{0,15}）$"
+
+        pattern = "（.{0,240}）$"
+        pattern = convert.pattern2utf8(pattern)
         s = re.sub(pattern, "", s, count=0)
-        pattern = "^作者.{0,15}$"
+
+        pattern = "作者.{0,240}$"
+        pattern = convert.pattern2utf8(pattern)
         s = re.sub(pattern, "", s, count=0)
+
+        s = convert.utf2str(s)
+        new_doc = d.copy()
+        new_doc.content = s
+        cut_off_list.append(new_doc)
+
+    return cut_off_list
