@@ -138,6 +138,7 @@ class xml_news_handler(sax.ContentHandler):
         if tag == 'doc':
             # create a new element when start elemnt is doc
             self._doc = doc()
+            self._doc.textrank = {}
 
     def endElement(self, tag):
         if tag == 'doc':
@@ -146,8 +147,6 @@ class xml_news_handler(sax.ContentHandler):
             if self._doc.date and self._doc.content and self._doc.docno and self._doc.url and self._doc.contenttitle:
                 # add the date into list if the doc is not empty
                 self.doc_list.append(self._doc)
-        elif tag == 'texkrank':
-            self._doc.textrank = {}
 
     def characters(self, content):
         if not content.strip():
@@ -162,9 +161,9 @@ class xml_news_handler(sax.ContentHandler):
             self._doc.content = content.strip()
         elif self._tag == 'date':
             self._doc.date = content.strip()
-        elif self._tag == "word":
+        elif self._tag == 'word':
             self._word = content
-        elif self._tag == "weight":
+        elif self._tag == 'weight':
             self._doc.textrank[self._word] = float(content)
 
 class doc(object):
@@ -226,6 +225,10 @@ class doc(object):
         c.docno = self.docno
         c.url = self.url
         c.contenttitle = self.contenttitle
+        copy_textrank = {}
+        for k,v in self.textrank.items():
+            copy_textrank[k] = v
+        c.textrank =copy_textrank
         return c
 
 from xml.dom import minidom
