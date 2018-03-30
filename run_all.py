@@ -54,7 +54,6 @@ end_time_stamp=show_time("all finished!")
 min_distance = 6
 same = []
 for index_a in range(doc_size):
-    distances.append([])
     for index_b in range(index_a+1,doc_size):
         d = distances[index_a][index_b - index_a - 1]
         if d <= min_distance:
