@@ -36,3 +36,19 @@ def simhash(textrank, threshold=0):
         if sum[i] > threshold:
             result = result + (1 << i)
     return result
+
+def distance(simhash_1,simhash_2):
+    """
+    the mindistance of two value
+    :param simhash_1: hash value 1
+    :param simhash_2: hash value 2
+    :return: the minimal edit distance of them
+    """
+    v = simhash_1 ^ simhash_2
+    bin_str = bin(v)[2:32]
+    dist = 0
+    # caculate the 1 numbers
+    for b in bin_str:
+        if int(b) > 0:
+            dist = dist + 1
+    return dist
