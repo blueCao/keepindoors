@@ -27,7 +27,7 @@ collection:
 import pymongo
 
 def __get__():
-    return pymongo.MongoClient("localhost", 27017)
+    return pymongo.MongoClient("master", 27017)
 
 def insertDoc(doc,mongo_cli,databbase_name,collection_name):
     """
