@@ -4,6 +4,10 @@
 similarity hash algorithm to caculate the text similarity
 """
 
+# get system max int length
+import sys
+INT_BITS_LENGTH=len(bin(sys.maxsize)) - 1
+
 def simhash(textrank, threshold=0):
     """
     caculate the hash value of the textrank topK value
@@ -13,7 +17,7 @@ def simhash(textrank, threshold=0):
     """
     # each position is a sum of all words' hash value
     sum = []
-    for i in range(32):
+    for i in range(INT_BITS_LENGTH):
         sum.append(0)
     for word,weight in textrank.items():
         # 1. hash value of single word
@@ -32,7 +36,7 @@ def simhash(textrank, threshold=0):
             start_index = start_index - 1
     # convert the sum into binary
     result = 0
-    for i in range(32):
+    for i in range(INT_BITS_LENGTH):
         if sum[i] > threshold:
             result = result + (1 << i)
     return result
@@ -45,7 +49,7 @@ def distance(simhash_1,simhash_2):
     :return: the minimal edit distance of them
     """
     v = simhash_1 ^ simhash_2
-    bin_str = bin(v)[2:32]
+    bin_str = bin(v)[2:INT_BITS_LENGTH]
     dist = 0
     # caculate the 1 numbers
     for b in bin_str:
