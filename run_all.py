@@ -5,6 +5,9 @@ import datetime
 """
 the running script of the project
 """
+import xml_handler as h
+import datetime
+from simhash import *
 
 def show_time(msg):
     """
@@ -32,7 +35,7 @@ doc_size = len(handler.doc_list)
 threshold = 0
 simhashes = []
 for index_a in range(doc_size):
-    simhashes.append(simhash.simhash(handler.doc_list[index_a].textrank, threshold))
+    simhashes.append(simhash(handler.doc_list[index_a].textrank, threshold))
 
 # show minmash distances caculate begin time
 begin_distances_time_stamp=show_time("begin minhash distances caculate")
@@ -45,7 +48,7 @@ for index_a in range(doc_size):
     for index_b in range(index_a+1,doc_size):
         simhash_a = simhashes[index_a]
         simhash_b = simhashes[index_b]
-        distances[index_a].append(simhash.distance(simhash_a,simhash_b))
+        distances[index_a].append(distance(simhash_a,simhash_b))
 
 # show minmash distances caculate begin time
 end_time_stamp=show_time("all finished!")
