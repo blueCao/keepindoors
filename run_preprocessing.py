@@ -3,7 +3,7 @@
 """
 the running script
 """
-import xml_handler as h
+from core import xml_handler as h
 
 # load data into memory
 handler = h.load_data_from_xml("input.xml")

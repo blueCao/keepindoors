@@ -3,7 +3,7 @@
 """
 the running script to only sampling part of data between begin date and end date
 """
-import xml_handler as h
+from core import xml_handler as h
 
 handler = h.load_data_from_xml("input.xml")
 

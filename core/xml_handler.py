@@ -115,12 +115,13 @@ OUTPUT xml date file form：<date> elements added, and <doc> elements were sorte
  </body>
 </html>
 -----------------------------------------------------------------------------------------------------------------------
-
 """
 import xml.sax as sax
 
 class xml_news_handler(sax.ContentHandler):
     """
+    Deprecated
+
     sax convert the xml file into list of doc
     """
     # result
@@ -341,7 +342,8 @@ def unique(duplicated_list):
     return list(set.values())
 
 import re
-import str2bytes2utf8 as convert
+from core import str2bytes2utf8 as convert
+
 
 def cut_off(list):
     """

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-basic struct graph, containing vertices and edges
+core struct graph, containing vertices and edges
 """
 
 from log import logger

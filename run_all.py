@@ -1,13 +1,9 @@
-import xml_handler as h
-import simhash
-import datetime
-
 """
 the running script of the project
 """
-import xml_handler as h
+import core.xml_handler as h
 import datetime
-from simhash import *
+from core.simhash import *
 
 def show_time(msg):
     """

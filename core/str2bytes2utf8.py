@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+python str、byte、utf8 transform
+"""
 
 def str2utf8(s):
     """
