@@ -18,8 +18,8 @@ from bson.objectid import ObjectId
 from datetime import datetime, timedelta
 import mongodb.mongo_cli as mongo
 
-# create datetime
-three_hours_ago = datetime.now() - timedelta(days=3)
+# create datetime, 8 hours is time zone loss
+three_hours_ago = datetime.now() - timedelta(hours=8,minutes=10)
 dummy_id = ObjectId.from_datetime(three_hours_ago)
 
 #  mongodb
@@ -78,8 +78,8 @@ import os
 
 # run sparksubmit
 spark_path = "~/spark-2.3.0-bin-hadoop2.7/bin/spark-submit"
-python_zip_path = "k.zip"
-python_job_path = "connectedComponentsJob.py"
+python_zip_path = "/home/hadoop/workspace/python/keepindoors.zip"
+python_job_path = "/home/hadoop/workspace/python/connectedComponentsJob.py"
 spark_cmd = spark_path + \
       " --master yarn --deploy-mode client --packages graphframes:graphframes:0.5.0-spark2.1-s_2.11" \
       " --executor-memory 4g --queue default"+\
