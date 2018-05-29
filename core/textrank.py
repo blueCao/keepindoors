@@ -18,7 +18,7 @@ def textrank(list):
         d["textrank"] = jieba.analyse.textrank(d["content"], 10,True)
 
 #
-# eprecated
+# Deprecated
 #
 # import jieba
 # import jieba.analyse
