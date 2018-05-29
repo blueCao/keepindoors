@@ -11,7 +11,7 @@ INT_BITS_LENGTH=len(bin(sys.maxsize)) - 1
 def simhash(textrank, threshold=0):
     """
     caculate the hash value of the textrank topK value
-    :param textrank: dict type, contains a word and a weight
+    :param textrank: list(duple) type, contains a word and a weight
     :param threshold: the thredshold value which determines the result each bit 0 or 1
     :return: the hash value(int)
     """
@@ -19,7 +19,7 @@ def simhash(textrank, threshold=0):
     sum = []
     for i in range(INT_BITS_LENGTH):
         sum.append(0)
-    for word,weight in textrank.items():
+    for word,weight in textrank:
         # 1. hash value of single word
         h = abs(hash(word))
         # 2. spilte hash value into 1 or 0
