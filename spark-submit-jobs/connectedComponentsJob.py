@@ -10,7 +10,7 @@ def main():
     # get a mongo client
     cli = mongo.__get__()
 
-    # v, ["id","url","titile","datetime"]
+    # v, ["id","url","title","datetime"]
     localVertices=[]
     cursor = mongo.getCollection(cli,"keepindoors","docs").find()
     for r in cursor:
@@ -24,7 +24,7 @@ def main():
     for r in cursor:
         localEdges.append((r["docno1"],r["docno2"],r["distance"]))
 
-    v = spark.createDataFrame(localVertices,["id","url","titile","datetime"])
+    v = spark.createDataFrame(localVertices,["id","url","title","datetime"])
     e = spark.createDataFrame(localEdges, ["src", "dst","distance"])
     g = GraphFrame(v,e)
     # get sparkContext from sparkSession
@@ -36,10 +36,11 @@ def main():
 
     # create component dict
     component_dict = {}
-    for row in result.collect():
+    for row in result:
         record = row.asDict()
         if record["component"] not in component_dict.keys():
-            component_dict[record["component"]].append(record)
+            component_dict[record["component"]] = []
+        component_dict[record["component"]].append(record)
 
     # delete mongo collection "component"
     mongo.deleteAll(cli,"keepindoors","components")
@@ -47,7 +48,7 @@ def main():
     # save component_dict into mongo
     index = 1
     for key,item in component_dict.items():
-        mongo.insertDoc({"no":index,"component":key,"titile":item[0]["title"],"docs":item},cli,"keepindoors","components")
+        mongo.insertDoc({"no":index,"component":key,"title":item[0]["title"],"docs":item},cli,"keepindoors","components")
         index += 1
 
     # save in hdfs
