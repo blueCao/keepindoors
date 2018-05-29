@@ -1,12 +1,7 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-spark job,using graphx caculate the connected Components
-"""
-
-import mongodb.mongo_cli as mongo
 from pyspark.sql import SparkSession
 from graphframes import GraphFrame
+import mongodb.mongo_cli as mongo
+from datetime import timedelta
 
 def main():
     # crate spark session
@@ -15,42 +10,48 @@ def main():
     # get a mongo client
     cli = mongo.__get__()
 
-    # v
+    # v, ["id","url","titile","datetime"]
     localVertices=[]
     cursor = mongo.getCollection(cli,"keepindoors","docs").find()
-    i = 0
     for r in cursor:
         # del "_id" key which will throws error when createDataFrame
-        if "_id" in r.keys():
-            del r["_id"]
-        if "simhash" in r.keys():
-            del r["simhash"]
         r["id"] = r["docno"]
-        r["name"] = str(i)
-        localVertices.append(r)
-        i = i + 1
+        localVertices.append((r["docno"],r["url"],r["title"],str(r["_id"].generation_time + timedelta(hours=8))))
 
     # e
-    localEdges = []
     cursor = mongo.getCollection(cli, "keepindoors", "distances").find()
-    # for r in cursor:
-    #     # del "_id" key which will throws error when createDataFrame
-    #     if "_id" in r.keys():
-    #         del r["_id"]
-    #     localEdges.append(r["same"])
     localEdges = []
     for r in cursor:
         localEdges.append((r["docno1"],r["docno2"],r["distance"]))
 
-    v = spark.createDataFrame(localVertices)
+    v = spark.createDataFrame(localVertices,["id","url","titile","datetime"])
     e = spark.createDataFrame(localEdges, ["src", "dst","distance"])
     g = GraphFrame(v,e)
     # get sparkContext from sparkSession
     spark.sparkContext.setCheckpointDir("/tmp/spark/checkpoint")
     result = g.connectedComponents()
 
+    # order by component,datetime
+    result = result.orderBy(["component", "datetime"], ascending=[1, 0]).collect()
+
+    # create component dict
+    component_dict = {}
+    for row in result.collect():
+        record = row.asDict()
+        if record["component"] not in component_dict.keys():
+            component_dict[record["component"]].append(record)
+
+    # delete mongo collection "component"
+    mongo.deleteAll(cli,"keepindoors","components")
+
+    # save component_dict into mongo
+    index = 1
+    for key,item in component_dict.items():
+        mongo.insertDoc({"no":index,"component":key,"titile":item[0]["title"],"docs":item},cli,"keepindoors","components")
+        index += 1
+
     # save in hdfs
-    result.write.format("json").save("/tmp/spark/graphframes.json")
+    # result.write.format("json").save("/tmp/spark/graphframes.json")
 
 if __name__ == "__main__":
     main()
