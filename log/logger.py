@@ -18,7 +18,7 @@ def getLogger(logger_name):
     # initialize logging class
     logger = logging.getLogger(logger_name)
     # set default logging configuration
-    logger.setLevel(logging.DEBUG)  # default log level
+    logger.setLevel(logging.WARN)  # default log level
     format = logging.Formatter("### %(asctime)s #%(name)s #Line %(lineno)d#%(levelname)s### %(message)s")  # output format
     sh = logging.StreamHandler(stream=sys.stdout)  # output to standard output
     sh.setFormatter(format)
