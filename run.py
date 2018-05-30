@@ -19,7 +19,7 @@ from datetime import datetime, timedelta
 import mongodb.mongo_cli as mongo
 
 # create datetime, 8 hours is time zone loss
-three_hours_ago = datetime.now() - timedelta(hours=8,minutes=10)
+three_hours_ago = datetime.now() - timedelta(hours=8,minutes=30)
 dummy_id = ObjectId.from_datetime(three_hours_ago)
 
 #  mongodb
@@ -70,20 +70,23 @@ for d_a in new_docs:
 
 # ************************************** 4. insert the [distande] values into mongodb
 collname = "distances"
-mongo.insertDocs(distances,cli,dbname,collname)
-log.info("<4> insert the [distande] values into mongodb")
+if distances:
+    mongo.insertDocs(distances,cli,dbname,collname)
+    log.info("<4> insert the [distande] values into mongodb")
+    # ************************************** 5. system call : sparksubmit using graphx and wait for finishing (in spark, insert [component] into mongodb)
+    import os
 
-# ************************************** 5. system call : sparksubmit using graphx and wait for finishing (in spark, insert [component] into mongodb)
-import os
-
-# run sparksubmit
-spark_path = "~/spark-2.3.0-bin-hadoop2.7/bin/spark-submit"
-python_zip_path = "/home/hadoop/workspace/python/keepindoors.zip"
-python_job_path = "/home/hadoop/workspace/python/connectedComponentsJob.py"
-spark_cmd = spark_path + \
-      " --master yarn --deploy-mode client --packages graphframes:graphframes:0.5.0-spark2.1-s_2.11" \
-      " --executor-memory 4g --queue default"+\
-      " --py-files  " + python_zip_path + \
-      " " + python_job_path
-os.system(spark_cmd)
-log.info(spark_cmd)
+    # run sparksubmit
+    spark_path = "~/spark-2.3.0-bin-hadoop2.7/bin/spark-submit"
+    python_zip_path = "/home/hadoop/workspace/python/keepindoors.zip"
+    python_job_path = "/home/hadoop/workspace/python/connectedComponentsJob.py"
+    spark_cmd = spark_path + \
+          " --master yarn --deploy-mode client --packages graphframes:graphframes:0.5.0-spark2.1-s_2.11" \
+          " --executor-memory 4g --queue default"+\
+          " --py-files  " + python_zip_path + \
+          " " + python_job_path
+    os.system(spark_cmd)
+    log.info(spark_cmd)
+    log.info("<5> spark graphx command finished!")
+else:
+    log.info("<4> new distances is empty,finished!")
