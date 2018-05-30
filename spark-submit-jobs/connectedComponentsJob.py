@@ -48,7 +48,17 @@ def main():
     # save component_dict into mongo
     index = 1
     for key,item in component_dict.items():
-        mongo.insertDoc({"no":index,"component":key,"title":item[0]["title"],"docs":item},cli,"keepindoors","components")
+        links = []
+        titles = []
+        title = "empty title"
+        update_time = "1970-01-01 00:00:00+00:00"
+        for doc in item:
+            titles.append(doc["title"])
+            links.append(doc["url"])
+            if doc["datetime"] > update_time:
+                update_time = doc["datetime"]
+                title = doc["title"]
+        mongo.insertDoc({"no":index,"component":key,"title":title,"size":len(item),"links":links,"titles":titles,"docs":item},cli,"keepindoors","components")
         index += 1
 
     # save in hdfs
