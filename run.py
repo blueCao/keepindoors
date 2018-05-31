@@ -19,7 +19,7 @@ from datetime import datetime, timedelta
 import mongodb.mongo_cli as mongo
 
 # create datetime, 8 hours is time zone loss
-three_hours_ago = datetime.now() - timedelta(hours=8,minutes=30)
+three_hours_ago = datetime.now() - timedelta(hours=8,minutes=60)
 dummy_id = ObjectId.from_datetime(three_hours_ago)
 
 #  mongodb
@@ -71,15 +71,19 @@ for d_a in new_docs:
 # ************************************** 4. insert the [distande] values into mongodb
 collname = "distances"
 if distances:
-    mongo.insertDocs(distances,cli,dbname,collname)
-    log.info("<4> insert the [distande] values into mongodb")
+    # filter the duplicated
+    for d in distances:
+        if mongo.getCollection(cli,dbname,collname).find_one({"docno1":d["docno1"],"docno2":d["docno2"]}) or mongo.getCollection(cli, dbname, collname).find_one({"docno1": d["docno2"], "docno2": d["docno1"]}):
+            continue
+        mongo.insertDoc(d, cli, dbname, collname)
+        log.info("<4> insert the distance: "+str(d)+"  into mongodb")
     # ************************************** 5. system call : sparksubmit using graphx and wait for finishing (in spark, insert [component] into mongodb)
     import os
 
     # run sparksubmit
     spark_path = "~/spark-2.3.0-bin-hadoop2.7/bin/spark-submit"
-    python_zip_path = "/home/hadoop/workspace/python/keepindoors.zip"
-    python_job_path = "/home/hadoop/workspace/python/connectedComponentsJob.py"
+    python_zip_path = "/home/hadoop/workspace/python/keepindoors/keepindoors.zip"
+    python_job_path = "/home/hadoop/workspace/python/keepindoors/spark-submit-jobs/connectedComponentsJob.py"
     spark_cmd = spark_path + \
           " --master yarn --deploy-mode client --packages graphframes:graphframes:0.5.0-spark2.1-s_2.11" \
           " --executor-memory 4g --queue default"+\
