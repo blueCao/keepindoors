@@ -58,7 +58,7 @@ def main():
             if doc["datetime"] > update_time:
                 update_time = doc["datetime"]
                 title = doc["title"]
-        mongo.insertDoc({"no":index,"component":key,"title":title,"size":len(item),"links":links,"titles":titles,"docs":item},cli,"keepindoors","components")
+        mongo.insertDoc({"no":index,"component":key,"title":title,"size":len(item),"links":links,"titles":titles,"update_time":update_time,"docs":item},cli,"keepindoors","components")
         index += 1
 
     # save in hdfs
