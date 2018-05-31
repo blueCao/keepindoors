@@ -19,7 +19,7 @@ from datetime import datetime, timedelta
 import mongodb.mongo_cli as mongo
 
 # create datetime, 8 hours is time zone loss
-three_hours_ago = datetime.now() - timedelta(hours=8,minutes=60)
+three_hours_ago = datetime.now() - timedelta(hours=8,minutes=15)
 dummy_id = ObjectId.from_datetime(three_hours_ago)
 
 #  mongodb
